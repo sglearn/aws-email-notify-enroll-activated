@@ -1,0 +1,22 @@
+{
+  "name": "aws-email-notify-enroll-activated",
+  "version": "1.0.0",
+  "description": "lambda function send email notify that thier enroll is activated",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sglearn/aws-email-notify-enroll-activated.git"
+  },
+  "author": "duongtdn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/duongtdn/aws-email-notify-enroll-activated/issues"
+  },
+  "homepage": "https://github.com/duongtdn/aws-email-notify-enroll-activated#readme",
+  "dependencies": {
+    "aws-sdk": "^2.331.0"
+  }
+}
