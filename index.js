@@ -9,26 +9,38 @@ const ses = new aws.SES({
 
 const sender = `${process.env.SENDER_NAME} <${process.env.SENDER_MAIL_ADDRESS}>`;
 
-function sendEmail({recipient, course, customer = 'Customer'}) {
+function sendEmail({recipient, courses, customer = 'Customer'}) {
 
   // The subject line for the email.
-  const subject = `Your enrollment for course ${course.courseId} at ${process.env.SERVICE} is completed`;
+  const subject = `Your enrollment at ${process.env.SERVICE} is processed`;
+
+  const signature = `
+    ${process.env.SIGNATURE}
+  `
 
   // The email body for recipients with non-HTML email clients.
-  const body_text = "Dear " + customer + ",\r\n"
-                  + "Your enrollment for the following course(s) is completed successfully \r\n" 
-                  + course.title + " (" + course.courseId + ")" + "\r\n"
-                  + "To go to your study page, please access the following link\r\n"
-                  + `${process.env.LEARNDESK}/course/${course.courseId}\r\n`
-                  + "Enjoy your study\r\n"
-                  + "This email is auto-generated. Please do not reply this email.\r\n"
-                  + "Thank you for using our services.\r\n"
-                  + "Sincerely, \r\n"
-                  + process.env.SIGNATURE;
+   // The email body for recipients with non-HTML email clients.
+  let body_text = "Dear " + customer + ",\r\n"
+                  + "Your enrollment has been processed successfully \r\n"
+                  + "The following courses has been activated \r\n"
+
+  
+  courses.forEach( course =>  {
+    body_text += " " + course.title + "\r\n"
+  })       
+
+  body_text +=  "Thank you for using our service.\r\n"
+  + "This email is auto-generated. Please do not reply this email.\r\n"
+  + "Sincerely,\r\n"
+
+  body_text += signature
+
+
 
   // The HTML body of the email.
-  const body_html = `<html>
+  let body_html = `<html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       table, th, td {
         border: 1px solid black;
@@ -53,27 +65,45 @@ function sendEmail({recipient, course, customer = 'Customer'}) {
     </style>
   </head>
   <body>
-    <p>Dear ${customer},</p>
-    <p>Your enrollment for the following course(s) is completed successfully</p>
+    <p> Dear ${customer}, </p>
+    <p> Your enrollment has been processed successfully </p>
+    <p> The following courses has been activated </p>
+  `
+
+  body_html += `
     <table>
       <tr>
-        <th> Code </th>
-        <th> Name </th>
+        <th> Course </th>
+        <th> Status </th>
       </tr>
-      <tr>
-        <td> ${course.courseId} </td>
-        <td> ${course.title} </td>
-      </tr>
+  `
+
+  courses.forEach(course => {
+    body_html += `
+        <tr>
+          <td> ${course.title} </td>
+          <td> Activated </td>
+        </tr>
+    `
+  }) 
+  
+  body_html += `
     </table>
-    <p> To go to your study page, please access the following link <p>
-    <a href='${process.env.LEARNDESK}/course/${course.courseId}' > ${process.env.LEARNDESK}/course/${course.courseId} </a>
-    <p> Enjoy your study </p>
-    <p> This email is auto-generated. Please <b>do not reply</b> this email.</p>
-    <p> Thank you for using our services </p>
+  `
+
+  body_html += `
+    <br />
+    <p> Thank you for using our service. </p>
+    <p> This email is auto-generated. Please <b>do not reply</b> this email </p>
+  `
+
+  body_html += `
+    <br />
     <p> Sincerely, </p>
-    <p> ${process.env.SIGNATURE} </p>
+    ${signature}
   </body>
-  </html>`;
+  </html>
+  `
 
   // The character encoding for the email.
   const charset = "UTF-8";
